@@ -22,10 +22,6 @@ export const Sidebar = () => {
         <FaChurch className="mr-3" />
         Client Details
         </Link>
-        <Link href="/dashboard/client_profile" className="block py-2 px-6 rounded-lg hover:bg-blue-300 flex items-center">
-        <FaBuilding className="mr-3" />
-        Client Profile
-        </Link>
       
       </nav>
     </div>

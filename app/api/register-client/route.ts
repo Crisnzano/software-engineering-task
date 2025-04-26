@@ -1,12 +1,12 @@
-import { createClient } from "@/utils/supabase/server"
-
-const supabase = createClient()
+import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const supabase = createClient(); // 🛠️ MOVE createClient here!
+
   const body = await req.json();
 
-  const { data, error } = await (await supabase).from("clients").insert([
+  const { data, error } = await supabase.from("clients").insert([
     {
       first_name: body.firstName,
       last_name: body.lastName,

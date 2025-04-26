@@ -1,15 +1,14 @@
-import { createClient } from "@/utils/supabase/server"
-
-const supabase = createClient()
+import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const supabase = createClient(); // 🛠️ Move inside POST!
 
+    const body = await req.json();
     const { title, diseaseType, description, goal, targetAudience, activities, partners } = body;
 
-    const { error } = await (await supabase).from('health_programs').insert({
+    const { error } = await supabase.from('health_programs').insert({
       title,
       disease_type: diseaseType,
       description,

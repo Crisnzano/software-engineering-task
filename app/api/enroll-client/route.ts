@@ -2,25 +2,25 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const supabase = createClient();
-
-// Define a validation schema
+// Define validation schema
 const EnrollmentSchema = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
-  dateOfBirth: z.string(), // dates come as stringified JSON from client
+  dateOfBirth: z.string(),
   gender: z.enum(["male", "female", "other"]),
   contactNumber: z.string().optional(),
   address: z.string().optional(),
   referralSource: z.string().optional(),
   notes: z.string().optional(),
   consentGiven: z.boolean(),
-  enrollmentDate: z.tuple([z.string(), z.string()]), // tuple of [startDate, endDate]
+  enrollmentDate: z.tuple([z.string(), z.string()]),
   programs: z.array(z.string()).min(1),
 });
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = createClient(); // 🛠️ Move inside POST!
+
     const body = await req.json();
 
     // Validate request body
@@ -44,11 +44,11 @@ export async function POST(req: NextRequest) {
       programs,
     } = parsed.data;
 
-    const { error } = await (await supabase).from('client_enrollments').insert({
+    const { error } = await supabase.from('client_enrollments').insert({
       first_name: firstName,
       last_name: lastName,
       date_of_birth: dateOfBirth,
-      gender: gender,
+      gender,
       contact_number: contactNumber || null,
       address: address || null,
       referral_source: referralSource || null,
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       consent_given: consentGiven,
       enrollment_start_date: enrollmentDate[0],
       enrollment_end_date: enrollmentDate[1],
-      programs: programs,
+      programs,
     });
 
     if (error) {

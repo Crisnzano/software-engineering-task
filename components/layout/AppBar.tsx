@@ -37,7 +37,7 @@ export default function AppBar() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-10 p-2 border-b" 
-    style={{ backgroundColor: "#c38257" }} // Custom Brown Color
+    style={{ backgroundColor: "green" }} // Custom Brown Color
     >
       <Menubar className="rounded-none border-none px-2 lg:px-4 flex justify-between items-center">
         <MenubarMenu>

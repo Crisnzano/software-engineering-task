@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -56,212 +55,35 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
+import { useState, useEffect, Key, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from "react";
 
-// Sample client data
-const clients = [
-  {
-    id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    dateOfBirth: new Date("1985-05-15"),
-    gender: "male",
-    contactNumber: "+1234567890",
-    address: "123 Main St, City",
-    enrolledPrograms: [
-      {
-        id: "1",
-        name: "TB Prevention and Treatment",
-        diseaseType: "tb",
-        enrollmentDate: new Date("2023-01-15"),
-      },
-    ],
-    status: "active",
-  },
-  {
-    id: "2",
-    firstName: "Jane",
-    lastName: "Smith",
-    dateOfBirth: new Date("1990-08-22"),
-    gender: "female",
-    contactNumber: "+0987654321",
-    address: "456 Oak Ave, Town",
-    enrolledPrograms: [
-      {
-        id: "2",
-        name: "Malaria-Free Communities",
-        diseaseType: "malaria",
-        enrollmentDate: new Date("2023-02-10"),
-      },
-      {
-        id: "5",
-        name: "Youth HIV Awareness",
-        diseaseType: "hiv",
-        enrollmentDate: new Date("2023-03-05"),
-      },
-    ],
-    status: "active",
-  },
-  {
-    id: "3",
-    firstName: "Michael",
-    lastName: "Johnson",
-    dateOfBirth: new Date("1978-11-30"),
-    gender: "male",
-    contactNumber: "+1122334455",
-    address: "789 Pine Rd, Village",
-    enrolledPrograms: [
-      {
-        id: "3",
-        name: "HIV Testing and Counseling",
-        diseaseType: "hiv",
-        enrollmentDate: new Date("2023-01-20"),
-      },
-    ],
-    status: "inactive",
-  },
-  {
-    id: "4",
-    firstName: "Sarah",
-    lastName: "Williams",
-    dateOfBirth: new Date("1992-04-12"),
-    gender: "female",
-    contactNumber: "+5544332211",
-    address: "101 Elm St, County",
-    enrolledPrograms: [
-      {
-        id: "4",
-        name: "Maternal TB Screening",
-        diseaseType: "tb",
-        enrollmentDate: new Date("2023-02-25"),
-      },
-    ],
-    status: "active",
-  },
-  {
-    id: "5",
-    firstName: "Robert",
-    lastName: "Brown",
-    dateOfBirth: new Date("1980-07-08"),
-    gender: "male",
-    contactNumber: "+6677889900",
-    address: "202 Cedar Ln, District",
-    enrolledPrograms: [
-      {
-        id: "1",
-        name: "TB Prevention and Treatment",
-        diseaseType: "tb",
-        enrollmentDate: new Date("2023-03-10"),
-      },
-      {
-        id: "2",
-        name: "Malaria-Free Communities",
-        diseaseType: "malaria",
-        enrollmentDate: new Date("2023-03-15"),
-      },
-    ],
-    status: "active",
-  },
-  {
-    id: "6",
-    firstName: "Emily",
-    lastName: "Davis",
-    dateOfBirth: new Date("1995-09-18"),
-    gender: "female",
-    contactNumber: "+1234509876",
-    address: "303 Birch Dr, Region",
-    enrolledPrograms: [],
-    status: "pending",
-  },
-  {
-    id: "7",
-    firstName: "David",
-    lastName: "Miller",
-    dateOfBirth: new Date("1975-12-05"),
-    gender: "male",
-    contactNumber: "+0987612345",
-    address: "404 Maple Ave, Zone",
-    enrolledPrograms: [
-      {
-        id: "3",
-        name: "HIV Testing and Counseling",
-        diseaseType: "hiv",
-        enrollmentDate: new Date("2023-02-05"),
-      },
-    ],
-    status: "active",
-  },
-  {
-    id: "8",
-    firstName: "Lisa",
-    lastName: "Wilson",
-    dateOfBirth: new Date("1988-03-25"),
-    gender: "female",
-    contactNumber: "+5678901234",
-    address: "505 Oak St, Area",
-    enrolledPrograms: [
-      {
-        id: "5",
-        name: "Youth HIV Awareness",
-        diseaseType: "hiv",
-        enrollmentDate: new Date("2023-01-30"),
-      },
-    ],
-    status: "inactive",
-  },
-  {
-    id: "9",
-    firstName: "James",
-    lastName: "Taylor",
-    dateOfBirth: new Date("1982-06-14"),
-    gender: "male",
-    contactNumber: "+3456789012",
-    address: "606 Pine Ave, Sector",
-    enrolledPrograms: [
-      {
-        id: "4",
-        name: "Maternal TB Screening",
-        diseaseType: "tb",
-        enrollmentDate: new Date("2023-03-20"),
-      },
-    ],
-    status: "active",
-  },
-  {
-    id: "10",
-    firstName: "Patricia",
-    lastName: "Anderson",
-    dateOfBirth: new Date("1970-10-10"),
-    gender: "female",
-    contactNumber: "+7890123456",
-    address: "707 Elm Rd, Block",
-    enrolledPrograms: [
-      {
-        id: "1",
-        name: "TB Prevention and Treatment",
-        diseaseType: "tb",
-        enrollmentDate: new Date("2023-02-15"),
-      },
-      {
-        id: "3",
-        name: "HIV Testing and Counseling",
-        diseaseType: "hiv",
-        enrollmentDate: new Date("2023-03-01"),
-      },
-    ],
-    status: "active",
-  },
-];
 
-export default function ClientRegistry() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [programFilter, setProgramFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedClient, setSelectedClient] = useState<
-    (typeof clients)[0] | null
-  >(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const itemsPerPage = 5;
+  export default function ClientRegistry() {
+    const [clients, setClients] = useState<any[]>([]); // 👈 You forgot this line!
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [programFilter, setProgramFilter] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedClient, setSelectedClient] = useState<any>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+    const itemsPerPage = 5;
+
+
+
+    useEffect(() => {
+        const fetchClients = async () => {
+          try {
+            const response = await fetch("/api/clients");
+            const data = await response.json();
+            setClients(data); // now this works!
+          } catch (error) {
+            console.error("Failed to fetch clients:", error);
+          }
+        };
+    
+        fetchClients();
+      }, []);
+    
 
   // Filter clients based on search query and filters
   const filteredClients = clients.filter((client) => {
@@ -278,7 +100,7 @@ export default function ClientRegistry() {
     const matchesProgram =
       programFilter === "all" ||
       client.enrolledPrograms.some(
-        (program) => program.diseaseType === programFilter
+        (program: { diseaseType: string; }) => program.diseaseType === programFilter
       );
 
     return matchesSearch && matchesStatus && matchesProgram;
@@ -447,7 +269,7 @@ export default function ClientRegistry() {
                         {client.enrolledPrograms.length > 0 ? (
                           client.enrolledPrograms
                             .slice(0, 2)
-                            .map((program) => (
+                            .map((program: { id: Key | null | undefined; diseaseType: string; }) => (
                               <span key={program.id}>
                                 {getProgramBadge(program.diseaseType)}
                               </span>
@@ -639,7 +461,7 @@ export default function ClientRegistry() {
                 <TabsContent value="programs" className="space-y-4 mt-4">
                   {selectedClient.enrolledPrograms.length > 0 ? (
                     <div className="space-y-4">
-                      {selectedClient.enrolledPrograms.map((program) => (
+                      {selectedClient.enrolledPrograms.map((program: { id: Key | null | undefined; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; diseaseType: string; enrollmentDate: number | Date; }) => (
                         <Card key={program.id}>
                           <CardHeader className="py-3">
                             <div className="flex items-center justify-between">
@@ -678,7 +500,7 @@ export default function ClientRegistry() {
                       </p>
                       <p className="font-medium">Client record created</p>
                     </div>
-                    {selectedClient.enrolledPrograms.map((program) => (
+                    {selectedClient.enrolledPrograms.map((program: { id: Key | null | undefined; enrollmentDate: number | Date; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; diseaseType: string; }) => (
                       <div
                         key={program.id}
                         className="border-l-2 border-muted pl-4 py-2"

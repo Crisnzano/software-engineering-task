@@ -43,11 +43,25 @@ export default function HealthProgramCreator() {
     },
   })
 
-  function onSubmit(data: FormValues) {
-    console.log(data)
-    // Here you would typically save the program to your backend
-    alert("Health program created successfully!")
+  async function onSubmit(data: FormValues) {
+    const response = await fetch("/api/health-program", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+  
+    if (response.ok) {
+      alert("Health program created successfully!");
+      form.reset();
+      setActivities([""]);
+    } else {
+      const result = await response.json();
+      alert(result.message || "There was an error creating the health program.");
+    }
   }
+  
 
   const handleActivityChange = (index: number, value: string) => {
     const newActivities = [...activities]

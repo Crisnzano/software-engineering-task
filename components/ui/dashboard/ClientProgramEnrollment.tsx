@@ -149,19 +149,51 @@ export default function ClientProgramEnrollment() {
     },
   });
 
-  function onSubmit(data: FormValues) {
-    console.log(data);
-    toast(
-      <div>
-        <strong>Client enrolled successfully</strong>
-        <div>
-          {data.firstName} {data.lastName} has been enrolled in{" "}
-          {data.programs.length} program(s).
-        </div>
-      </div>,
-      { action: <ToastAction altText="View Client">View</ToastAction> }
-    );
+  async function onSubmit(data: FormValues) {
+    try {
+      // Prepare data: convert Date objects to ISO strings
+      const payload = {
+        ...data,
+        dateOfBirth: data.dateOfBirth?.toISOString(),
+        enrollmentDate: [
+          data.enrollmentDate?.[0]?.toISOString(),
+          data.enrollmentDate?.[1]?.toISOString(),
+        ],
+      };
+  
+      const response = await fetch("/api/enroll-client", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.ok) {
+        toast(
+          <div>
+            <strong>Client enrolled successfully!</strong>
+            <div>
+              {data.firstName} {data.lastName} has been enrolled in{" "}
+              {data.programs.length} program{data.programs.length > 1 ? "s" : ""}.
+            </div>
+          </div>,
+          {
+            action: <ToastAction altText="View Client">View</ToastAction>,
+          }
+        );
+        form.reset(); // Clear the form
+        setSelectedPrograms([]); // Reset selected programs
+      } else {
+        const result = await response.json();
+        toast.error(result.message || "Enrollment failed.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    }
   }
+  
 
   const handleProgramSelect = (programId: string) => {
     setSelectedPrograms((current) =>

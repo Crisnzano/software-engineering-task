@@ -139,16 +139,23 @@ export default function ClientRegistrationForm() {
     },
   });
 
-  function onSubmit(data: FormValues) {
-    console.log(data);
-    toast(
-      <div>
-        <p className="font-semibold">Client registered successfully</p>
-        <p>{`${data.firstName} ${data.lastName} has been added to the system.`}</p>
-        <ToastAction altText="View">View Client</ToastAction>
-      </div>
-    );
+  async function onSubmit(data: FormValues) {
+    const response = await fetch("/api/register-client", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Failed to register client:", error);
+      return;
+    }
+  
+    const result = await response.json();
+    console.log(result.message);
+    toast.success("Client registered successfully!");
   }
+  
   const nextStep = () => {
     if (step === "personal") {
       const personalFields = ["firstName", "lastName", "dateOfBirth", "gender"];

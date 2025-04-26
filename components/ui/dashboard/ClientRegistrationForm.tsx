@@ -1,49 +1,99 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { CalendarIcon, Save, UserPlus } from "lucide-react"
-import { format } from "date-fns"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { CalendarIcon, Save, UserPlus } from "lucide-react";
+import { format } from "date-fns";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
-import { toast } from 'sonner'
-import { ToastAction } from "@/components/ui/toast"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { ToastAction } from "@/components/ui/toast";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const formSchema = z.object({
   // Personal Information
-  firstName: z.string().min(2, { message: "First name must be at least 2 characters" }),
-  lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
+  firstName: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters" }),
+  lastName: z
+    .string()
+    .min(2, { message: "Last name must be at least 2 characters" }),
   dateOfBirth: z.date({ required_error: "Date of birth is required" }),
-  gender: z.enum(["male", "female", "other"], { required_error: "Gender is required" }),
+  gender: z.enum(["male", "female", "other"], {
+    required_error: "Gender is required",
+  }),
   idNumber: z.string().optional(),
 
   // Contact Information
-  contactNumber: z.string().min(10, { message: "Contact number must be at least 10 digits" }),
+  contactNumber: z
+    .string()
+    .min(10, { message: "Contact number must be at least 10 digits" }),
   alternativeContact: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address" }).optional().or(z.literal("")),
-  address: z.string().min(5, { message: "Address must be at least 5 characters" }),
+  email: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .optional()
+    .or(z.literal("")),
+  address: z
+    .string()
+    .min(5, { message: "Address must be at least 5 characters" }),
 
   // Additional Information
   occupation: z.string().optional(),
   maritalStatus: z.enum(["single", "married", "divorced", "widowed", "other"], {
     required_error: "Marital status is required",
   }),
-  emergencyContactName: z.string().min(2, { message: "Emergency contact name must be at least 2 characters" }),
-  emergencyContactNumber: z.string().min(10, { message: "Emergency contact number must be at least 10 digits" }),
-  emergencyContactRelation: z.string().min(2, { message: "Relation must be at least 2 characters" }),
+  emergencyContactName: z
+    .string()
+    .min(2, {
+      message: "Emergency contact name must be at least 2 characters",
+    }),
+  emergencyContactNumber: z
+    .string()
+    .min(10, {
+      message: "Emergency contact number must be at least 10 digits",
+    }),
+  emergencyContactRelation: z
+    .string()
+    .min(2, { message: "Relation must be at least 2 characters" }),
 
   // Medical Information
   allergies: z.string().optional(),
@@ -57,12 +107,14 @@ const formSchema = z.object({
   consentToShareData: z.boolean().refine((value) => value === true, {
     message: "You must consent to data sharing for treatment purposes",
   }),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 export default function ClientRegistrationForm() {
-  const [step, setStep] = useState<"personal" | "contact" | "additional" | "medical" | "consent">("personal")
+  const [step, setStep] = useState<
+    "personal" | "contact" | "additional" | "medical" | "consent"
+  >("personal");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -85,38 +137,38 @@ export default function ClientRegistrationForm() {
       consentToContact: false,
       consentToShareData: false,
     },
-  })
+  });
 
   function onSubmit(data: FormValues) {
-    console.log(data)
+    console.log(data);
     toast(
       <div>
         <p className="font-semibold">Client registered successfully</p>
         <p>{`${data.firstName} ${data.lastName} has been added to the system.`}</p>
         <ToastAction altText="View">View Client</ToastAction>
       </div>
-    )
+    );
   }
   const nextStep = () => {
     if (step === "personal") {
-      const personalFields = ["firstName", "lastName", "dateOfBirth", "gender"]
+      const personalFields = ["firstName", "lastName", "dateOfBirth", "gender"];
       const isValid = personalFields.every((field) => {
-        const result = form.trigger(field as any)
-        return result
-      })
+        const result = form.trigger(field as any);
+        return result;
+      });
 
       if (isValid) {
-        setStep("contact")
+        setStep("contact");
       }
     } else if (step === "contact") {
-      const contactFields = ["contactNumber", "address"]
+      const contactFields = ["contactNumber", "address"];
       const isValid = contactFields.every((field) => {
-        const result = form.trigger(field as any)
-        return result
-      })
+        const result = form.trigger(field as any);
+        return result;
+      });
 
       if (isValid) {
-        setStep("additional")
+        setStep("additional");
       }
     } else if (step === "additional") {
       const additionalFields = [
@@ -124,48 +176,56 @@ export default function ClientRegistrationForm() {
         "emergencyContactName",
         "emergencyContactNumber",
         "emergencyContactRelation",
-      ]
+      ];
       const isValid = additionalFields.every((field) => {
-        const result = form.trigger(field as any)
-        return result
-      })
+        const result = form.trigger(field as any);
+        return result;
+      });
 
       if (isValid) {
-        setStep("medical")
+        setStep("medical");
       }
     } else if (step === "medical") {
-      setStep("consent")
+      setStep("consent");
     }
-  }
+  };
 
   const prevStep = () => {
     if (step === "contact") {
-      setStep("personal")
+      setStep("personal");
     } else if (step === "additional") {
-      setStep("contact")
+      setStep("contact");
     } else if (step === "medical") {
-      setStep("additional")
+      setStep("additional");
     } else if (step === "consent") {
-      setStep("medical")
+      setStep("medical");
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader className="bg-green-50 dark:bg-green-900/20">
         <div className="flex items-center gap-2">
           <UserPlus className="h-5 w-5 text-green-600" />
-          <CardTitle className="text-xl font-bold text-green-800 dark:text-green-300">Register New Client</CardTitle>
+          <CardTitle className="text-xl font-bold text-green-800 dark:text-green-300">
+            Register New Client
+          </CardTitle>
         </div>
-        <CardDescription>Add a new client to the health information system</CardDescription>
+        <CardDescription>
+          Add a new client to the health information system
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
         <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <div className={`text-sm font-medium ${step === "personal" ? "text-green-600" : "text-muted-foreground"}`}>
+            <div
+              className={`text-sm font-medium ${step === "personal" ? "text-green-600" : "text-muted-foreground"}`}
+            >
               Personal
             </div>
-            <div className={`text-sm font-medium ${step === "contact" ? "text-green-600" : "text-muted-foreground"}`}>
+            <div
+              className={`text-sm font-medium ${step === "contact" ? "text-green-600" : "text-muted-foreground"}`}
+            >
               Contact
             </div>
             <div
@@ -173,10 +233,14 @@ export default function ClientRegistrationForm() {
             >
               Additional
             </div>
-            <div className={`text-sm font-medium ${step === "medical" ? "text-green-600" : "text-muted-foreground"}`}>
+            <div
+              className={`text-sm font-medium ${step === "medical" ? "text-green-600" : "text-muted-foreground"}`}
+            >
               Medical
             </div>
-            <div className={`text-sm font-medium ${step === "consent" ? "text-green-600" : "text-muted-foreground"}`}>
+            <div
+              className={`text-sm font-medium ${step === "consent" ? "text-green-600" : "text-muted-foreground"}`}
+            >
               Consent
             </div>
           </div>
@@ -205,7 +269,9 @@ export default function ClientRegistrationForm() {
             {step === "personal" && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+                  <h3 className="text-lg font-medium mb-4">
+                    Personal Information
+                  </h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -241,33 +307,16 @@ export default function ClientRegistrationForm() {
                       control={form.control}
                       name="dateOfBirth"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>Date of Birth</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value ? format(field.value, "PPP") : <span>Select date</span>}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <DatePicker
+                              selected={field.value}
+                              onChange={(date) => field.onChange(date)}
+                              maxDate={new Date()}
+                              className="border rounded-md p-2 w-full"
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -289,19 +338,25 @@ export default function ClientRegistrationForm() {
                                 <FormControl>
                                   <RadioGroupItem value="male" />
                                 </FormControl>
-                                <FormLabel className="font-normal">Male</FormLabel>
+                                <FormLabel className="font-normal">
+                                  Male
+                                </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
                                   <RadioGroupItem value="female" />
                                 </FormControl>
-                                <FormLabel className="font-normal">Female</FormLabel>
+                                <FormLabel className="font-normal">
+                                  Female
+                                </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
                                   <RadioGroupItem value="other" />
                                 </FormControl>
-                                <FormLabel className="font-normal">Other</FormLabel>
+                                <FormLabel className="font-normal">
+                                  Other
+                                </FormLabel>
                               </FormItem>
                             </RadioGroup>
                           </FormControl>
@@ -319,9 +374,14 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>ID Number (Optional)</FormLabel>
                           <FormControl>
-                            <Input placeholder="National ID, passport, etc." {...field} />
+                            <Input
+                              placeholder="National ID, passport, etc."
+                              {...field}
+                            />
                           </FormControl>
-                          <FormDescription>Any official identification number if available</FormDescription>
+                          <FormDescription>
+                            Any official identification number if available
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -330,7 +390,11 @@ export default function ClientRegistrationForm() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button type="button" onClick={nextStep} className="bg-green-600 hover:bg-green-700">
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
                     Next
                   </Button>
                 </div>
@@ -341,7 +405,9 @@ export default function ClientRegistrationForm() {
             {step === "contact" && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Contact Information</h3>
+                  <h3 className="text-lg font-medium mb-4">
+                    Contact Information
+                  </h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -350,7 +416,10 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Contact Number</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter phone number" {...field} />
+                            <Input
+                              placeholder="Enter phone number"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -364,7 +433,10 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Alternative Contact (Optional)</FormLabel>
                           <FormControl>
-                            <Input placeholder="Alternative phone number" {...field} />
+                            <Input
+                              placeholder="Alternative phone number"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -380,7 +452,11 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Email Address (Optional)</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="Enter email address" {...field} />
+                            <Input
+                              type="email"
+                              placeholder="Enter email address"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -396,7 +472,11 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Residential Address</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="Enter full address" className="resize-none" {...field} />
+                            <Textarea
+                              placeholder="Enter full address"
+                              className="resize-none"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -409,7 +489,11 @@ export default function ClientRegistrationForm() {
                   <Button type="button" variant="outline" onClick={prevStep}>
                     Previous
                   </Button>
-                  <Button type="button" onClick={nextStep} className="bg-green-600 hover:bg-green-700">
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
                     Next
                   </Button>
                 </div>
@@ -420,7 +504,9 @@ export default function ClientRegistrationForm() {
             {step === "additional" && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Additional Information</h3>
+                  <h3 className="text-lg font-medium mb-4">
+                    Additional Information
+                  </h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -442,7 +528,10 @@ export default function ClientRegistrationForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Marital Status</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select marital status" />
@@ -473,7 +562,10 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Contact Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Emergency contact name" {...field} />
+                            <Input
+                              placeholder="Emergency contact name"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -487,7 +579,10 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Contact Number</FormLabel>
                           <FormControl>
-                            <Input placeholder="Emergency contact number" {...field} />
+                            <Input
+                              placeholder="Emergency contact number"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -503,7 +598,10 @@ export default function ClientRegistrationForm() {
                         <FormItem>
                           <FormLabel>Relationship to Client</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., Spouse, Parent, Child, Friend" {...field} />
+                            <Input
+                              placeholder="e.g., Spouse, Parent, Child, Friend"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -516,7 +614,11 @@ export default function ClientRegistrationForm() {
                   <Button type="button" variant="outline" onClick={prevStep}>
                     Previous
                   </Button>
-                  <Button type="button" onClick={nextStep} className="bg-green-600 hover:bg-green-700">
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
                     Next
                   </Button>
                 </div>
@@ -527,7 +629,9 @@ export default function ClientRegistrationForm() {
             {step === "medical" && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Medical Information</h3>
+                  <h3 className="text-lg font-medium mb-4">
+                    Medical Information
+                  </h3>
                   <FormField
                     control={form.control}
                     name="allergies"
@@ -591,7 +695,11 @@ export default function ClientRegistrationForm() {
                   <Button type="button" variant="outline" onClick={prevStep}>
                     Previous
                   </Button>
-                  <Button type="button" onClick={nextStep} className="bg-green-600 hover:bg-green-700">
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
                     Next
                   </Button>
                 </div>
@@ -610,12 +718,16 @@ export default function ClientRegistrationForm() {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md">
                           <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel>Consent to Contact</FormLabel>
                             <FormDescription>
-                              I consent to be contacted by health workers regarding my health and treatment.
+                              I consent to be contacted by health workers
+                              regarding my health and treatment.
                             </FormDescription>
                           </div>
                           <FormMessage />
@@ -629,13 +741,16 @@ export default function ClientRegistrationForm() {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md">
                           <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel>Consent to Share Data</FormLabel>
                             <FormDescription>
-                              I consent to my health information being shared with healthcare providers for treatment
-                              purposes.
+                              I consent to my health information being shared
+                              with healthcare providers for treatment purposes.
                             </FormDescription>
                           </div>
                           <FormMessage />
@@ -649,7 +764,10 @@ export default function ClientRegistrationForm() {
                   <Button type="button" variant="outline" onClick={prevStep}>
                     Previous
                   </Button>
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                  <Button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
                     <Save className="mr-2 h-4 w-4" /> Register Client
                   </Button>
                 </div>
@@ -659,9 +777,13 @@ export default function ClientRegistrationForm() {
         </Form>
       </CardContent>
       <CardFooter className="bg-muted/50 flex justify-between">
-        <p className="text-sm text-muted-foreground">Health Information System</p>
-        <p className="text-sm text-muted-foreground">Client Registration Module</p>
+        <p className="text-sm text-muted-foreground">
+          Health Information System
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Client Registration Module
+        </p>
       </CardFooter>
     </Card>
-  )
+  );
 }
